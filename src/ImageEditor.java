@@ -10,37 +10,43 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class ImageEditor{
-    private static int width;
-    private static int height;
-    private static int maxColor;
-    private static Pixel[][] picture;
+    private int width;
+    private int height;
+    private int maxColor;
+    private Pixel[][] picture;
 
     public static void main(String[] args){
         String inputFileName = args[0];
         String outputFileName = args[1];
         String transformType = args[2];
+        int blurSize = args.length == 4 ? Integer.parseInt(args[3]): 0;
         ImageEditor ie = new ImageEditor();
         ie.readFile(inputFileName);
-        ie.doTransformation();
+        ie.doTransformation(transformType, blurSize);
         ie.writeImage(outputFileName);
     }
 
-    public void writeImage(String output){
-        PrintWriter out = new PrintWriter(new File(output));
-        StringBuilder output = new StringBuilder();
-        output.append("P3\n"+width + " " + height + " " + maxColor + "\n");
-        for(Pixel[] row : picture){
-            for(Pixel p : row){
-                output.append(p.red +" "+p.green+" "+p.blue+"\n");
+    public void writeImage(String filename){
+        PrintWriter out;
+        try {
+            out = new PrintWriter(new File(filename));
+            StringBuilder output = new StringBuilder();
+            output.append("P3\n").append(width).append(" ").append(height).append(" ").append(maxColor).append("\n");
+            for(Pixel[] row : picture){
+                for(Pixel p : row){
+                    output.append(p.red).append(" ").append(p.green).append(" ").append(p.blue).append("\n");
+                }
             }
+            out.write(output.toString());
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-        out.write(output.toString());
-        out.close();
     }
 
-    public void doTransformation(){
-        for(int i = heigth - 1;i>=0;i--){
-            for(int k = 0, k < width; k++){
+    public void doTransformation(String transformType, int blursize){
+        for(int i = height - 1;i>=0;i--){
+            for(int k = 0; k < width; k++){
                 Pixel pixel = picture[i][k];
                 switch (transformType){
                     case "invert":
@@ -53,12 +59,11 @@ public class ImageEditor{
                         if(i<1 || k <1){
                             pixel.embose(128);
                         } else {
-                            pixel.embose(getEmbossValue(pixel, picture[i - 1][k - 1]);
+                            pixel.embose(getEmbossValue(pixel, picture[i - 1][k - 1]));
                         }
                         break;
                     case "motionblur":
-                        int blurLength = Integer.parseInt(args[3]);
-                        pixel.blur(blur(getBlurPixels(i,k,blurLength)));
+                        pixel.blur(blur(getBlurPixels(i,k,blursize)));
                         break;
                     default:
                         break;
@@ -68,9 +73,9 @@ public class ImageEditor{
     }
 
     private ArrayList<Pixel> getBlurPixels (int i, int k, int blur){
-        ArrayList<Pixel> values;
+        ArrayList<Pixel> values = new ArrayList<>();
         int blurBoundary = k + blur -1 >= width ? width - k : blur;
-        for(int j = 0: j < blurBoundary; j++){
+        for(int j = 0; j < blurBoundary; j++){
             values.add(picture[i][k+blurBoundary]);
         }
 
@@ -122,6 +127,7 @@ public class ImageEditor{
         } else if(maxDiff<0){
             maxDiff = 0;
         }
+        return maxDiff;
     }
 
     private class Pixel{
@@ -142,7 +148,7 @@ public class ImageEditor{
         }
 
         private void grayscale(){
-            int avg = (this.red + this.green + this.blue)/3);
+            int avg = (this.red + this.green + this.blue)/3;
             this.red = this.green = this.blue = avg;
         }
 
