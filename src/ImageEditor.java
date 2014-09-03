@@ -26,6 +26,10 @@ public class ImageEditor{
         ie.writeImage(outputFileName);
     }
 
+    private void skipComments(){
+        
+    }
+
     public void writeImage(String filename){
         PrintWriter out;
         try {
