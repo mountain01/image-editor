@@ -48,32 +48,30 @@ public class ImageEditor{
         for(int i = height - 1;i>=0;i--){
             for(int k = 0; k < width; k++){
                 Pixel pixel = picture[i][k];
-                switch (transformType){
-                    case "invert":
-                        pixel.invert();
-                        break;
-                    case "grayscale":
-                        pixel.grayscale();
-                        break;
-                    case "emboss":
-                        if(i<1 || k <1){
-                            pixel.embose(128);
-                        } else {
-                            pixel.embose(getEmbossValue(pixel, picture[i - 1][k - 1]));
-                        }
-                        break;
-                    case "motionblur":
-                        pixel.blur(blur(getBlurPixels(i,k,blursize)));
-                        break;
-                    default:
-                        break;
+                if (transformType.equals("invert")) {
+                    pixel.invert();
+
+                } else if (transformType.equals("grayscale")) {
+                    pixel.grayscale();
+
+                } else if (transformType.equals("emboss")) {
+                    if (i < 1 || k < 1) {
+                        pixel.embose(128);
+                    } else {
+                        pixel.embose(getEmbossValue(pixel, picture[i - 1][k - 1]));
+                    }
+
+                } else if (transformType.equals("motionblur")) {
+                    pixel.blur(blur(getBlurPixels(i, k, blursize)));
+
+                } else {
                 }
             }
         }
     }
 
     private ArrayList<Pixel> getBlurPixels (int i, int k, int blur){
-        ArrayList<Pixel> values = new ArrayList<>();
+        ArrayList<Pixel> values = new ArrayList<Pixel>();
         int blurBoundary = k + blur -1 >= width ? width - k : blur;
         for(int j = 0; j < blurBoundary; j++){
             values.add(picture[i][k+blurBoundary]);
