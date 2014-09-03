@@ -1,6 +1,11 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.lang.Math;
+import java.lang.StringBuffer;
+import java.lang.StringBuilder;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -17,34 +22,72 @@ public class ImageEditor{
         ImageEditor ie = new ImageEditor();
         ie.readFile(inputFileName);
         ie.doTransformation();
+        ie.writeImage(outputFileName);
+    }
 
+    public void writeImage(String output){
+        PrintWriter out = new PrintWriter(new File(output));
+        StringBuilder output = new StringBuilder();
+        output.append("P3\n"+width + " " + height + " " + maxColor + "\n");
+        for(Pixel[] row : picture){
+            for(Pixel p : row){
+                output.append(p.red +" "+p.green+" "+p.blue+"\n");
+            }
+        }
+        out.write(output.toString());
+        out.close();
     }
 
     public void doTransformation(){
         for(int i = heigth - 1;i>=0;i--){
-            for(int k = width - 1; k >=0;k--){
+            for(int k = 0, k < width; k++){
+                Pixel pixel = picture[i][k];
                 switch (transformType){
                     case "invert":
-                        picture[i][k].invert();
+                        pixel.invert();
                         break;
                     case "grayscale":
-                        picture[i][k].grayscale();
+                        pixel.grayscale();
                         break;
                     case "emboss":
-                        if(i<0 || k <0){
-                            picture[i][k].embose(128);
+                        if(i<1 || k <1){
+                            pixel.embose(128);
                         } else {
-                            picture[i][k].embose(getEmbossValue(picture[i][k],picture[i-1][k-1]);
+                            pixel.embose(getEmbossValue(pixel, picture[i - 1][k - 1]);
                         }
                         break;
                     case "motionblur":
                         int blurLength = Integer.parseInt(args[3]);
+                        pixel.blur(blur(getBlurPixels(i,k,blurLength)));
                         break;
                     default:
                         break;
                 }
             }
         }
+    }
+
+    private ArrayList<Pixel> getBlurPixels (int i, int k, int blur){
+        ArrayList<Pixel> values;
+        int blurBoundary = k + blur -1 >= width ? width - k : blur;
+        for(int j = 0: j < blurBoundary; j++){
+            values.add(picture[i][k+blurBoundary]);
+        }
+
+        return values;
+    }
+
+    private Pixel blur(ArrayList<Pixel> values){
+        int reds = 0;
+        int greens =0;
+        int blues = 0;
+        for(Pixel p:values){
+            reds += p.red;
+            greens += p.green;
+            blues += p.blue;
+        }
+
+        return new Pixel(reds/values.size(),greens/values.size(),blues/values.size());
     }
 
     public void readFile(String inputFile){
@@ -67,7 +110,7 @@ public class ImageEditor{
         }
     }
 
-    private int getEmbossValue(Pixel1,Pixel2){
+    private int getEmbossValue(Pixel Pixel1,Pixel Pixel2){
         int redDiff = Pixel1.red - Pixel2.red;
         int greenDiff =Pixel1.green - Pixel2.green;
         int blueDiff = Pixel1.blue - Pixel2.blue;
@@ -105,6 +148,12 @@ public class ImageEditor{
 
         private void embose(int value){
             this.red = this.blue = this.green = value;
+        }
+
+        private void blur(Pixel pixel){
+            this.red = pixel.red;
+            this.green = pixel.green;
+            this.blue = pixel.blue;
         }
     }
 }
