@@ -95,9 +95,9 @@ public class ImageEditor{
     private ArrayList<Pixel> getBlurPixels (int i, int k, int blur, Pixel pixel){
         ArrayList<Pixel> values = new ArrayList<Pixel>();
         values.add(pixel);
-        int blurBoundary = (k + blur >= width) ? width - k -1 : blur;
+        int blurBoundary = (k + blur >= width) ? width - k : blur;
         for(int j = 0; j < blurBoundary; j++){
-            values.add(picture[i][k+blurBoundary]);
+            values.add(picture[i][k+j]);
         }
 
         return values;
