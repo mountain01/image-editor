@@ -6,6 +6,7 @@ import java.lang.StringBuffer;
 import java.lang.StringBuilder;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.IllegalFormatFlagsException;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -16,18 +17,26 @@ public class ImageEditor{
     private Pixel[][] picture;
 
     public static void main(String[] args){
-        String inputFileName = args[0];
-        String outputFileName = args[1];
-        String transformType = args[2];
-        int blurSize = args.length == 4 ? Integer.parseInt(args[3]): 0;
-        ImageEditor ie = new ImageEditor();
-        ie.readFile(inputFileName);
-        ie.doTransformation(transformType, blurSize);
-        ie.writeImage(outputFileName);
+        try{
+            String inputFileName = args[0];
+            String outputFileName = args[1];
+            String transformType = args[2];
+            int blurSize = args.length == 4 ? Integer.parseInt(args[3]): 0;
+            ImageEditor ie = new ImageEditor();
+            ie.readFile(inputFileName);
+            ie.doTransformation(transformType, blurSize);
+            ie.writeImage(outputFileName);
+        } catch (IndexOutOfBoundsException e){
+            System.out.println("Usage: java ImageEditor in-file out-file (grayscale|invert|emboss|motionblur motion-blur-length)");
+        } catch (IllegalArgumentException e){
+            System.out.println("Usage: java ImageEditor in-file out-file (grayscale|invert|emboss|motionblur motion-blur-length)");
+        }
     }
 
-    private void skipComments(){
-        
+    private void skipComments(Scanner in){
+           while(in.hasNext("#[^\\n]*\\n\n")){
+
+           }
     }
 
     public void writeImage(String filename){
@@ -66,17 +75,22 @@ public class ImageEditor{
                     }
 
                 } else if (transformType.equals("motionblur")) {
-                    pixel.blur(blur(getBlurPixels(i, k, blursize)));
+                    if(blursize == 0){
+                        throw new IllegalArgumentException();
+                    }
+                    pixel.blur(blur(getBlurPixels(i, k, blursize, pixel)));
 
                 } else {
+                    throw new IllegalArgumentException();
                 }
             }
         }
     }
 
-    private ArrayList<Pixel> getBlurPixels (int i, int k, int blur){
+    private ArrayList<Pixel> getBlurPixels (int i, int k, int blur, Pixel pixel){
         ArrayList<Pixel> values = new ArrayList<Pixel>();
-        int blurBoundary = k + blur -1 >= width ? width - k : blur;
+        values.add(pixel);
+        int blurBoundary = (k + blur >= width) ? width - k -1 : blur;
         for(int j = 0; j < blurBoundary; j++){
             values.add(picture[i][k+blurBoundary]);
         }
