@@ -33,9 +33,14 @@ public class ImageEditor{
         }
     }
 
-    private void skipComments(Scanner in){
-           while(in.hasNext("#[^\\n]*\\n\n")){
+    private int getNextInt(Scanner in){
+        skipComments(in);
+        return in.nextInt();
+    }
 
+    private void skipComments(Scanner in){
+           while(in.hasNext("#[^\n]*")){
+                in.nextLine();
            }
     }
 
@@ -114,14 +119,16 @@ public class ImageEditor{
     public void readFile(String inputFile){
         try {
             Scanner in = new Scanner(new File(inputFile));
+            skipComments(in);
             in.next();
-            width = in.nextInt();
-            height = in.nextInt();
-            maxColor = in.nextInt();
+            skipComments(in);
+            width = getNextInt(in);
+            height = getNextInt(in);
+            maxColor = getNextInt(in);
             picture = new Pixel[height][width];
             for(int i = 0;i<height;i++){
                 for(int k = 0;k<width;k++){
-                    picture[i][k] = new Pixel(in.nextInt(),in.nextInt(),in.nextInt());
+                    picture[i][k] = new Pixel(getNextInt(in),getNextInt(in),getNextInt(in));
                 }
             }
 
