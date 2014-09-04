@@ -18,8 +18,8 @@ public class ImageEditor{
 
     public static void main(String[] args){
         try{
-            String inputFileName = args[0];
-            String outputFileName = args[1];
+            File inputFileName = new File(args[0]);
+            File outputFileName = new File(args[1]);
             String transformType = args[2];
             int blurSize = args.length == 4 ? Integer.parseInt(args[3]): 0;
             ImageEditor ie = new ImageEditor();
@@ -44,10 +44,10 @@ public class ImageEditor{
            }
     }
 
-    public void writeImage(String filename){
+    public void writeImage(File filename){
         PrintWriter out;
         try {
-            out = new PrintWriter(new File(filename));
+            out = new PrintWriter(filename);
             StringBuilder output = new StringBuilder();
             output.append("P3\n").append(width).append(" ").append(height).append(" ").append(maxColor).append("\n");
             for(Pixel[] row : picture){
@@ -116,9 +116,9 @@ public class ImageEditor{
         return new Pixel(reds/values.size(),greens/values.size(),blues/values.size());
     }
 
-    public void readFile(String inputFile){
+    public void readFile(File inputFile){
         try {
-            Scanner in = new Scanner(new File(inputFile));
+            Scanner in = new Scanner(inputFile);
             skipComments(in);
             in.next();
             skipComments(in);
@@ -132,7 +132,7 @@ public class ImageEditor{
                 }
             }
 
-
+            in.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
