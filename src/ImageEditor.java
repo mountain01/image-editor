@@ -142,8 +142,8 @@ public class ImageEditor{
         int redDiff = Pixel1.red - Pixel2.red;
         int greenDiff =Pixel1.green - Pixel2.green;
         int blueDiff = Pixel1.blue - Pixel2.blue;
-        int maxDiff = Math.abs(redDiff) > Math.abs(greenDiff) ? redDiff : greenDiff;
-        maxDiff = Math.abs(maxDiff) > Math.abs(blueDiff) ? maxDiff : blueDiff;
+        int maxDiff = Math.abs(redDiff) >= Math.abs(greenDiff) ? redDiff : greenDiff;
+        maxDiff = Math.abs(maxDiff) >= Math.abs(blueDiff) ? maxDiff : blueDiff;
         maxDiff += 128;
         if (maxDiff > 255){
             maxDiff = 255;
